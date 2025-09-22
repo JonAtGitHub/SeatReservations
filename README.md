@@ -9,3 +9,5 @@ in which case they too will sit in a random empty passenger seat.
 Passengers board one by one.
 What is the probability that you will sit in your assigned seat?
 NOTE: The crazy person might sit in his assigned seat; he is equally likely to sit in any other open seat.
+
+Added note: boarding order is random.
