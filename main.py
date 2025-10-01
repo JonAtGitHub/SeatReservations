@@ -1,29 +1,52 @@
 
-import itertools
 import random
 
+# number of passengers and seats
 NSEATS = 100
+
+# number of simulation runs
 NRUNS = 100000
 
-def pick_seat(seats):
-    allseats = set(range(1,NSEATS+1))
-    available = allseats.difference(seats)
-    choice = random.choice(list(available))
+# used as both passenger and seat #
+NRANGE = range(1, NSEATS+1)
+
+def pick_seat(seats_in_use):
+    all_seats = set(NRANGE)
+    available_seats = all_seats.difference(seats_in_use)
+    choice = random.choice(list(available_seats))
     return choice
 
 def runone():
-    boarding_order = list(range(1, NSEATS+1))
+    # assign seats (indexed by passenger #)
+    assigned_seats = list(NRANGE)
+    random.shuffle(assigned_seats)
+    assigned_seat = {}
+    actual_seat = {}
+    for passenger in NRANGE:
+        assigned_seat[passenger] = assigned_seats[passenger-1]
+
+    # determine boarding order
+    boarding_order = list(NRANGE)
     random.shuffle(boarding_order)
-    possible_crazy = boarding_order[:len(boarding_order)-1] # can't be last to board
+
+    # pick the crazy (can't be last to board)
+    possible_crazy = boarding_order[:len(boarding_order)-1]
     crazy = random.choice(possible_crazy)
-    seats = {}
+
+    # board the passengers
+    seats = {} # indexed by seat #
     for passenger in boarding_order:
-        seat = passenger
+        seat = assigned_seat[passenger]
         if passenger == crazy or seat in seats:
             seat = pick_seat(seats.keys())
         seats[seat] = passenger
-    assigned = boarding_order[-1]
-    return (seats[assigned] == assigned, ) # a tuple in case more info desired in future
+        actual_seat[passenger] = seat
+    
+    # did last passenger get his assigned seat
+    last_passenger = boarding_order[-1]
+    assigned = assigned_seat[last_passenger]
+    actual = actual_seat[last_passenger]
+    return (assigned == actual, ) # a tuple in case more info desired in future
 
 in_assigned = 0
 runs = 0
