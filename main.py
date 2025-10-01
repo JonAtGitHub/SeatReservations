@@ -2,19 +2,45 @@
 import random
 
 # number of passengers and seats
-NSEATS = 100
+NUM = 100
 
 # number of simulation runs
 NRUNS = 100000
 
 # used as both passenger and seat #
-NRANGE = range(1, NSEATS+1)
+NRANGE = range(1, NUM+1)
 
-def pick_seat(seats_in_use):
+# 0=random otherwise 50/50
+CRAZY_MODE = 0
+
+def pick_random_seat(seats_in_use):
     all_seats = set(NRANGE)
     available_seats = all_seats.difference(seats_in_use)
-    choice = random.choice(list(available_seats))
-    return choice
+    seat = random.choice(list(available_seats))
+    return seat
+
+def pick_crazy_seat(crazy_assigned_seat, seats_in_use):
+    if CRAZY_MODE == 0 or random.randrange(100) < 50:
+        # pick any available seat
+        seat = pick_random_seat(seats_in_use)
+    else:
+        # pick any available seat excluding crazy's seat
+        all_seats = set(NRANGE)
+        available_seats = all_seats.difference(seats_in_use)
+        candidate_seats = available_seats.difference([crazy_assigned_seat])
+        seat = random.choice(list(candidate_seats))
+    return seat
+
+def pick_seat(passenger, passenger_assigned_seat, crazy, crazy_assigned_seat, seats):
+    if passenger_assigned_seat in seats:
+        # seat occupied
+        seat = pick_random_seat(seats.keys())
+    elif passenger == crazy:
+        # seat not occupied but passenger is crazy
+        seat = pick_crazy_seat(crazy_assigned_seat, seats.keys())
+    else:
+        seat = passenger_assigned_seat
+    return seat
 
 def runone():
     # assign seats (indexed by passenger #)
@@ -36,9 +62,7 @@ def runone():
     # board the passengers
     seats = {} # indexed by seat #
     for passenger in boarding_order:
-        seat = assigned_seat[passenger]
-        if passenger == crazy or seat in seats:
-            seat = pick_seat(seats.keys())
+        seat = pick_seat(passenger, assigned_seat[passenger], crazy, assigned_seat[crazy], seats)
         seats[seat] = passenger
         actual_seat[passenger] = seat
     
@@ -50,7 +74,7 @@ def runone():
 
 in_assigned = 0
 runs = 0
-for run in range(0, NRUNS):
+for run in range(NRUNS):
     runs += 1
     results = runone()
     if results[0]:
