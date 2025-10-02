@@ -1,4 +1,4 @@
-Puzzle from AJS (source unkownd):
+Puzzle from AJS (source unkown):
 
 There are 100 passengers waiting in line to board an airliner with 100 passenger seats.
 The seats are numbered from 1 to 100.
